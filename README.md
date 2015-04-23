@@ -1,13 +1,14 @@
 Todo Notifier
 =====================
 
-This is mainly an example of unit and integration testing an MVP android app that uses [Kotlin],
-[Dagger], [Rx], and [Cupboard]. The app itself shows a nagger in the Android notification bar every X minutes, where
+This is mainly an example of unit and integration testing an MVP android app that uses [Kotlin](http://kotlinlang.org/docs/tutorials/kotlin-android.html),
+[Dagger 2](http://google.github.io/dagger/), [Rx](https://github.com/ReactiveX/RxAndroid), and [Cupboard](https://bitbucket.org/qbusict/cupboard). The app itself shows a nagger in the Android notification bar every X minutes, where
 X is a setting stored in SQLite. I chose SQLite instead of SharedPreferences solely so I could play
 around with asynchronus apis.
 
 ##Setup
-Aside from what build.gradle has taken care of, you need a few plugins in Android Studio.
+Aside from what build.gradle has taken care of, you need the Kotlin plugin in Android Studio. I am
+using Android Studio 1.2 for the unit testing support.
 
 ##Challenges
 ###Kotlin
