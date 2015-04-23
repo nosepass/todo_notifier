@@ -1,0 +1,12 @@
+<resources>
+    <string-array name="nag_interval_labels">
+        <item>Every 15mins</item>
+        <item>Every 30mins</item>
+        <item>Every 60mins</item>
+    </string-array>
+    <integer-array name="nag_interval_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </integer-array>
+</resources>

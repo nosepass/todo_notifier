@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Todo Notifier</string>
+    <string name="enable">Enable Todo Nagger</string>
+    <string name="interval_label">Nag Interval</string>
+</resources>
