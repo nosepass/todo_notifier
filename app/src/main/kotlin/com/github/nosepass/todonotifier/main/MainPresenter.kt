@@ -31,19 +31,12 @@ public open class MainPresenter : Presenter<MainView> {
     init {
         v("init")
         Dagger.graph.inject(this)
+        modelLoad.subscribe { model = it }
     }
 
     override fun start() {
         v("start")
         if (model == null) {
-//            rxPrefDb!!.query(javaClass<TodoPrefData>())
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(errorPassingSubscriber(errors, {
-//                        v("model loaded from sql")
-//                        model = it
-//                        modelLoad.onNext(it)
-//                    }))
             sqlObservable {
                 var todopref = cupboard!!.query(javaClass<TodoPrefData>()).get()
                 if (todopref == null) {
@@ -67,7 +60,9 @@ public open class MainPresenter : Presenter<MainView> {
         view.setLoadInProgress(true)
         subscriptions.push(modelLoad.subscribe { view.updateFromModel(it); view.setLoadInProgress(false) })
         subscriptions.push(errors.subscribe { view.onError(it) })
-        subscriptions.push(view.enableObservable.subscribe { model?.enable = it; apply() })
+        subscriptions.push(view.enableObservable.subscribe {
+            model?.enable = it; apply()
+        })
         subscriptions.push(view.intervalObservable.subscribe { model?.interval = it })
     }
 

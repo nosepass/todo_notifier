@@ -60,7 +60,7 @@ public class MainPresenterTest {
         MainPresenter p = new MainPresenter();
         p.start();
         testIoScheduler.triggerActions();
-        verify(cupboard).query(TodoPrefData.class); // TODO this is prolly unnecesary
+        verify(cupboard).query(TodoPrefData.class); // TODO this is prolly unnecessary
         assertNotNull("model was not loaded", p.getModel());
     }
 
@@ -70,12 +70,9 @@ public class MainPresenterTest {
     }
 
     @Test
-    public void shouldSendModelToView() {
-        MainView view = mockView();
+    public void shouldSendModelToViewWhenLoaded() {
         MainPresenter p = new MainPresenter();
-        p.onTakeView(view);
-        p.start();
-        testIoScheduler.triggerActions();
+        MainView view = getMockedViewInStartedState(p);
         verify(view).updateFromModel(model);
     }
 
@@ -84,21 +81,15 @@ public class MainPresenterTest {
         Throwable err = new RuntimeException("the sqlite failed for mysterious reasons!");
         module.setExternallyMockedSingleton(DatabaseCompartment.class, mockErrorCupboard(err));
 
-        MainView view = mockView();
         MainPresenter p = new MainPresenter();
-        p.onTakeView(view);
-        p.start();
-        testIoScheduler.triggerActions();
+        MainView view = getMockedViewInStartedState(p);
         verify(view).onError(err);
     }
 
     @Test
     public void shouldUpdateModelOnEnableCheckboxChange() {
-        MainView view = mockView();
         MainPresenter p = new MainPresenter();
-        p.onTakeView(view);
-        p.start();
-        testIoScheduler.triggerActions();
+        MainView view = getMockedViewInStartedState(p);
 
         assertEquals(false, model.enable);
         view.getEnableObservable().onNext(true);
@@ -117,7 +108,12 @@ public class MainPresenterTest {
 
     @Test
     public void shouldUpdateModelOnIntervalSpinnerChange() {
-        assertTrue(false);
+        MainPresenter p = new MainPresenter();
+        MainView view = getMockedViewInStartedState(p);
+
+        assertEquals(0, model.interval);
+        view.getIntervalObservable().onNext(15);
+        assertEquals("the model was not updated when the interval changed!", 15, model.interval);
     }
 
     @Test
@@ -128,6 +124,15 @@ public class MainPresenterTest {
     @Test
     public void shouldUpdateAlarmOnStop() {
         assertTrue(false);
+    }
+
+
+    private MainView getMockedViewInStartedState(MainPresenter p) {
+        MainView view = mockView();
+        p.onTakeView(view);
+        p.start();
+        testIoScheduler.triggerActions();
+        return view;
     }
 
     private MainView mockView() {
