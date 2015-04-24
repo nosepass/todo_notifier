@@ -15,7 +15,7 @@ open class MyAlarmManagerImpl[Inject](val context: Context, val alarmManager: Al
         v("setAlarm ${intervalInMs}")
         cancelAlarm()
         val startTime = System.currentTimeMillis() + intervalInMs / 2
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, startTime, intervalInMs, alarmIntent())
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, startTime, intervalInMs, alarmIntent(intervalInMs))
     }
 
     override fun cancelAlarm() {
@@ -23,8 +23,9 @@ open class MyAlarmManagerImpl[Inject](val context: Context, val alarmManager: Al
         alarmManager.cancel(alarmIntent())
     }
 
-    open fun alarmIntent() : PendingIntent {
+    open fun alarmIntent(interval: Long = 0) : PendingIntent {
         val i = Intent(context, javaClass<AlarmReceiver>())
-        return PendingIntent.getBroadcast(context, 0, i, 0)
+        i.putExtra(AlarmReceiver.EXTRA_INTERVAL, interval)
+        return PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 }

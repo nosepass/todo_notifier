@@ -13,4 +13,5 @@ public interface AppComponent {
     void inject(MyApplication a);
     void inject(MainActivity a);
     void inject(MainPresenter a);
+    void inject(AlarmReceiver a);
 }

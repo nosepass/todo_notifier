@@ -32,7 +32,7 @@ public class MyAlarmManagerTest {
             // I'd rather doReturn(alarmIntent).when(subject).alarmIntent()
             // but something about Kotlin prevents that
             @Override
-            public PendingIntent alarmIntent() {
+            public PendingIntent alarmIntent(long interval) {
                 return alarmIntent;
             }
         });
@@ -44,6 +44,13 @@ public class MyAlarmManagerTest {
         subject.setAlarm(interval);
         verify(alarmManager).setInexactRepeating(eq(AlarmManager.RTC_WAKEUP), anyLong(),
                 eq(interval), eq(alarmIntent));
+    }
+
+    @Test
+    public void shouldPassIntervalIntoAlarmIntent() {
+        long interval = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
+        subject.setAlarm(interval);
+        verify(subject).alarmIntent(interval);
     }
 
     @Test
