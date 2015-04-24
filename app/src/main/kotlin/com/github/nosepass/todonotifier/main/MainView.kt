@@ -11,5 +11,5 @@ public trait MainView {
     public val intervalObservable: BehaviorSubject<Int>
     fun setLoadInProgress(stillLoading: Boolean)
     fun updateFromModel(model: TodoPrefData)
-    fun onError(e: Throwable)
+    fun onError(err: Throwable)
 }

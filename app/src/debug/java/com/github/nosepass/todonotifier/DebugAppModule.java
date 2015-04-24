@@ -1,5 +1,6 @@
 package com.github.nosepass.todonotifier;
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -52,6 +53,26 @@ public class DebugAppModule {
             return mock(Context.class);
         } else {
             return appModule.provideApplicationContext();
+        }
+    }
+
+    @Provides
+    @Singleton
+    AlarmManager provideAlarmManager(Context c) {
+        if (mock) {
+            return mock(AlarmManager.class);
+        } else {
+            return appModule.provideAlarmManager(c);
+        }
+    }
+
+    @Provides
+    @Singleton
+    MyAlarmManager provideMyAlarmManager(Context c, AlarmManager am) {
+        if (mock) {
+            return mock(MyAlarmManager.class);
+        } else {
+            return appModule.provideMyAlarmManager(c, am);
         }
     }
 

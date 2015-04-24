@@ -1,6 +1,6 @@
 package com.github.nosepass.todonotifier;
 
-import android.app.Application;
+import android.app.AlarmManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -30,6 +30,18 @@ public class AppModule {
     @Singleton
     Context provideApplicationContext() {
         return appContext;
+    }
+
+    @Provides
+    @Singleton
+    AlarmManager provideAlarmManager(Context c) {
+        return (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
+    }
+
+    @Provides
+    @Singleton
+    MyAlarmManager provideMyAlarmManager(Context c, AlarmManager am) {
+        return new MyAlarmManagerImpl(c, am);
     }
 
     @Provides

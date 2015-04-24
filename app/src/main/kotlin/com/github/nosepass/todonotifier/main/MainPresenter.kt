@@ -1,12 +1,9 @@
 package com.github.nosepass.todonotifier.main
 
 import android.content.Context
-import com.github.nosepass.todonotifier.Dagger
-import com.github.nosepass.todonotifier.Presenter
+import com.github.nosepass.todonotifier.*
 import com.github.nosepass.todonotifier.db.TodoPrefData
-import com.github.nosepass.todonotifier.errorPassingSubscriber
 import com.github.nosepass.todonotifier.kaffeine.v
-import com.github.nosepass.todonotifier.sqlObservable
 import nl.qbusict.cupboard.DatabaseCompartment
 import rx.Subscription
 import rx.subjects.BehaviorSubject
@@ -21,6 +18,8 @@ public open class MainPresenter : Presenter<MainView> {
     var context: Context? = null
         [Inject] set
     var cupboard: DatabaseCompartment? = null
+        [Inject] set
+    var alarmManager: MyAlarmManager? = null
         [Inject] set
     var view: MainView? = null
     var model: TodoPrefData? = null
@@ -75,5 +74,13 @@ public open class MainPresenter : Presenter<MainView> {
 
     fun apply() {
         v("apply")
+        sqlObservable {
+            cupboard!!.put(model)
+        }.subscribe {}
+        if (model?.enable ?: false) {
+            alarmManager!!.setAlarm(model!!.interval)
+        } else {
+            alarmManager!!.cancelAlarm()
+        }
     }
 }
