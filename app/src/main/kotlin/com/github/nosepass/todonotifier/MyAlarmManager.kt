@@ -5,6 +5,6 @@ package com.github.nosepass.todonotifier
  * This gets called on the configured interval and launches a notification.
  */
 trait MyAlarmManager {
-    fun setAlarm(intervalInMinutes: Int)
+    fun setAlarm(intervalInMs: Long)
     fun cancelAlarm()
 }

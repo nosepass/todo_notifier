@@ -78,7 +78,7 @@ public open class MainPresenter : Presenter<MainView> {
             cupboard!!.put(model)
         }.subscribe {}
         if (model?.enable ?: false) {
-            alarmManager!!.setAlarm(model!!.interval)
+            alarmManager!!.setAlarm(model!!.interval * 1000L)
         } else {
             alarmManager!!.cancelAlarm()
         }
