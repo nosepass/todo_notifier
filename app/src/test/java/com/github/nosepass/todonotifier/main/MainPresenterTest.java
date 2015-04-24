@@ -4,12 +4,10 @@ import com.github.nosepass.todonotifier.Dagger;
 import com.github.nosepass.todonotifier.DaggerDebugAppComponent;
 import com.github.nosepass.todonotifier.DebugAppModule;
 import com.github.nosepass.todonotifier.MyAlarmManager;
+import com.github.nosepass.todonotifier.TestLog;
 import com.github.nosepass.todonotifier.db.TodoPrefData;
 import com.github.nosepass.todonotifier.kaffeine.LogHolder;
-import com.github.nosepass.todonotifier.kaffeine.MyLog;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +21,6 @@ import rx.subjects.BehaviorSubject;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -50,8 +47,6 @@ public class MainPresenterTest {
         when(mockQuery.get()).thenReturn(model);
 
         alarmManager = mock(MyAlarmManager.class);
-        doNothing().when(alarmManager).setAlarm(anyInt());
-        doNothing().when(alarmManager).cancelAlarm();
 
         module = new DebugAppModule(true, null);
         module.setExternallyMockedSingleton(DatabaseCompartment.class, cupboard);
@@ -209,41 +204,5 @@ public class MainPresenterTest {
         DatabaseCompartment cupboard = mock(DatabaseCompartment.class);
         when(cupboard.query(TodoPrefData.class)).thenThrow(t);
         return cupboard;
-    }
-
-    private class TestLog implements MyLog {
-        void println(String message, Throwable t) {
-            System.out.printf("%s %s\n", message, t);
-        }
-
-        @Override
-        public void v(@NotNull String tag, @NotNull String message, @Nullable Throwable exception) {
-            println(message, exception);
-        }
-
-        @Override
-        public void d(@NotNull String tag, @NotNull String message, @Nullable Throwable exception) {
-            println(message, exception);
-        }
-
-        @Override
-        public void i(@NotNull String tag, @NotNull String message, @Nullable Throwable exception) {
-            println(message, exception);
-        }
-
-        @Override
-        public void w(@NotNull String tag, @NotNull String message, @Nullable Throwable exception) {
-            println(message, exception);
-        }
-
-        @Override
-        public void e(@NotNull String tag, @NotNull String message, @Nullable Throwable exception) {
-            println(message, exception);
-        }
-
-        @Override
-        public void wtf(@NotNull String tag, @NotNull String message, @Nullable Throwable exception) {
-            println(message, exception);
-        }
     }
 }
