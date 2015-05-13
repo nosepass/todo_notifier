@@ -7,11 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 import com.github.nosepass.todonotifier.db.CupboardSQLiteOpenHelper;
 import com.github.nosepass.todonotifier.main.MainPresenter;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import nl.qbusict.cupboard.DatabaseCompartment;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
@@ -66,10 +69,10 @@ public class AppModule {
         return new MainPresenter();
     }
 
-//    @Provides
-//    @Singleton
-//    @Named("MainThread")
-//    Scheduler provideAndroidMainThreadScheduler() {
-//        return AndroidSchedulers.mainThread();
-//    }
+    @Provides
+    @Singleton
+    @Named("MainThread")
+    Scheduler provideAndroidMainThreadScheduler() {
+        return AndroidSchedulers.mainThread();
+    }
 }

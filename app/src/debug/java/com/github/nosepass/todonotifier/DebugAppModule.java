@@ -11,11 +11,13 @@ import org.mockito.Mockito;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import nl.qbusict.cupboard.DatabaseCompartment;
+import rx.Scheduler;
 
 /**
  * A Dagger module that can be switched to output mocked representations of dependencies.
@@ -99,9 +101,21 @@ public class DebugAppModule {
     @Singleton
     MainPresenter providePresenter() {
         if (mock) {
-            return mock (MainPresenter.class);
+            return mock(MainPresenter.class);
         } else {
             return appModule.providePresenter();
+        }
+    }
+
+    @Provides
+    @Singleton
+    @Named("MainThread")
+    Scheduler provideAndroidMainThreadScheduler() {
+        if (mock) {
+            // TODO have the mock mechanism handle @Named
+            return mock(Scheduler.class);
+        } else {
+            return appModule.provideAndroidMainThreadScheduler();
         }
     }
 }

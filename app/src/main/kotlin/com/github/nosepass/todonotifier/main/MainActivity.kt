@@ -3,10 +3,8 @@ package com.github.nosepass.todonotifier.main
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.CheckedTextView
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import com.github.nosepass.todonotifier.Dagger
 import com.github.nosepass.todonotifier.R
 import com.github.nosepass.todonotifier.db.TodoPrefData
@@ -19,6 +17,7 @@ import rx.subjects.BehaviorSubject
 import rx.subjects.PublishSubject
 import javax.inject.Inject
 
+
 /**
  * This acts as the view implementation for MainPresenter.
  */
@@ -28,7 +27,7 @@ public class MainActivity : AppCompatActivity(), MainView {
         [Inject] set
     override var enableObservable: BehaviorSubject<Boolean> = BehaviorSubject.create()
     override var intervalObservable: BehaviorSubject<Int> = BehaviorSubject.create()
-    var intervalValues: IntArray? = null
+    var intervalValues: IntArray = IntArray(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super<AppCompatActivity>.onCreate(savedInstanceState)
@@ -41,7 +40,22 @@ public class MainActivity : AppCompatActivity(), MainView {
 
         val labels = getResources().getStringArray(R.array.nag_interval_labels)
         intervalValues = getResources().getIntArray(R.array.nag_interval_values)
-        intervalSpinner.setAdapter(ArrayAdapter(this, R.layout.spinner_summary_item, R.id.summary, labels))
+        intervalSpinner.setAdapter(object: ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, labels)  {
+            // Adds a static title header, with the selected value in a smaller 'summary' textview
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup) : View {
+                var v = convertView ?:
+                        getLayoutInflater().inflate(R.layout.spinner_summary_item, parent, false)
+                // I wish this worked, but it only works if the view is attached to
+                // the activity already
+                //summary.setText(getItem(position))
+                (v.findViewById(R.id.summary) as TextView).setText(getItem(position))
+                return v
+            }
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup) : View {
+                // Dropdown contents shall use simple_dropdown_item_1line
+                return super<ArrayAdapter>.getView(position, convertView, parent)
+            }
+        })
         enable.setEnabled(false)
         intervalSpinner.setEnabled(false)
 
@@ -49,7 +63,7 @@ public class MainActivity : AppCompatActivity(), MainView {
                 .map { e: OnClickEvent -> (e.view() as CheckedTextView).isChecked()  }
                 .subscribe { enableObservable.onNext(it) }
         observeSelect(intervalSpinner, javaClass<String>())
-                .map { intervalValues!![labels.indexOf(it)] } // transform label string to int interval
+                .map { intervalValues[labels.indexOf(it)] } // transform label string to int interval
                 .subscribe { intervalObservable.onNext(it) }
     }
 
@@ -64,12 +78,13 @@ public class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun onDestroy() {
+        super<AppCompatActivity>.onDestroy()
         presenter?.onDropView()
     }
 
     override fun updateFromModel(model: TodoPrefData) {
         enable.setChecked(model.enable)
-        val pos = intervalValues!!.indexOf(model.interval)
+        val pos = intervalValues.indexOf(model.interval)
         if (pos >= 0) intervalSpinner.setSelection(pos)
     }
 
@@ -78,7 +93,7 @@ public class MainActivity : AppCompatActivity(), MainView {
         intervalSpinner.setEnabled(!stillLoading)
     }
 
-    override fun onError(t: Throwable) {
+    override fun onError(err: Throwable) {
         Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show()
     }
 

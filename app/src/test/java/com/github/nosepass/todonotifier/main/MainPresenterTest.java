@@ -75,6 +75,11 @@ public class MainPresenterTest {
     }
 
     @Test
+    public void shouldCreateModelRowIfNotPresent() {
+        assertTrue(false);
+    }
+
+    @Test
     public void shouldNotifyViewOfModelLoadProgress() {
         MainPresenter p = new MainPresenter();
         MainView view = mockView();

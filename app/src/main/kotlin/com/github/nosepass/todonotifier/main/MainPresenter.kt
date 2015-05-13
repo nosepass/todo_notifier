@@ -5,10 +5,13 @@ import com.github.nosepass.todonotifier.*
 import com.github.nosepass.todonotifier.db.TodoPrefData
 import com.github.nosepass.todonotifier.kaffeine.v
 import nl.qbusict.cupboard.DatabaseCompartment
+import rx.Scheduler
+import rx.Subscriber
 import rx.Subscription
 import rx.subjects.BehaviorSubject
 import java.util.LinkedList
 import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * The business logic for the main screen. The main screen is just a settings page
@@ -21,6 +24,8 @@ public open class MainPresenter : Presenter<MainView> {
         [Inject] set
     var alarmManager: MyAlarmManager? = null
         [Inject] set
+    var mainScheduler: Scheduler? = null
+        [Inject] set([Named("MainThread")] v) { $mainScheduler = v }
     var view: MainView? = null
     var model: TodoPrefData? = null
     public val modelLoad: BehaviorSubject<TodoPrefData> = BehaviorSubject.create()
@@ -30,6 +35,8 @@ public open class MainPresenter : Presenter<MainView> {
     init {
         v("init")
         Dagger.graph.inject(this)
+        modelLoad.observeOn(mainScheduler)
+        errors.observeOn(mainScheduler)
         modelLoad.subscribe { model = it }
     }
 
@@ -57,7 +64,10 @@ public open class MainPresenter : Presenter<MainView> {
         assert(this.view == null)
         this.view = view
         view.setLoadInProgress(true)
-        subscriptions.push(modelLoad.subscribe { view.updateFromModel(it); view.setLoadInProgress(false) })
+        subscriptions.push(modelLoad.subscribe {
+            view.updateFromModel(it)
+            view.setLoadInProgress(false)
+        })
         subscriptions.push(errors.subscribe { view.onError(it) })
         subscriptions.push(view.enableObservable.subscribe {
             model?.enable = it; apply()
@@ -76,7 +86,7 @@ public open class MainPresenter : Presenter<MainView> {
         v("apply")
         sqlObservable {
             cupboard!!.put(model)
-        }.subscribe {}
+        }.subscribe({}, { errors.onNext(it) })
         if (model?.enable ?: false) {
             alarmManager!!.setAlarm(model!!.interval * 1000L)
         } else {
